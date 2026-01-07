@@ -19,4 +19,6 @@ Local setup:
 
 This is a minimal, zero-cost stack: no paid APIs are used.
 
-Next steps (optional): add persistent backend with SQLite if you want server-side backups or accounts.
+New features added: a fresh, friendly UI, streak tracking, PWA manifest and service worker skeleton, daily reminder tools (in-app reminders and downloadable calendar reminder), and export/import for local backups.
+
+Next steps (optional): add a small push-server (open-source `web-push`) to enable web push notifications, or add persistent backend with SQLite if you want server-side backups or accounts.

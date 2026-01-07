@@ -29,9 +29,39 @@ export default function UnitPage(){
     const key = 'progress'
     const raw = localStorage.getItem(key)
     const obj = raw ? JSON.parse(raw) : {}
+    // mark unit completed
     obj[id as string] = true
     localStorage.setItem(key, JSON.stringify(obj))
     setCompleted(true)
+
+    // update streak & last active date
+    const today = new Date().toISOString().slice(0,10)
+    const lastDate = localStorage.getItem('lastActiveDate')
+    const lastDoneKey = `done_${today}`
+    // avoid double counting same day
+    if(!localStorage.getItem(lastDoneKey)){
+      const prev = lastDate ? new Date(lastDate) : null
+      let streak = Number(localStorage.getItem('streak') || 0)
+      if(prev){
+        const diff = (new Date(today).getTime() - prev.getTime()) / (1000*60*60*24)
+        if(diff <= 1){
+          streak = streak + 1
+        } else {
+          streak = 1
+        }
+      } else {
+        streak = 1
+      }
+      localStorage.setItem('streak', String(streak))
+      localStorage.setItem('lastActiveDate', today)
+      localStorage.setItem(lastDoneKey, '1')
+    }
+
+    // if notifications are allowed and a reminder time exists, show a quick congratulatory notification
+    const reminderTime = localStorage.getItem('reminder_time')
+    if(window.Notification && Notification.permission === 'granted'){
+      new Notification('Great job!', { body: 'You completed a short lesson today.' })
+    }
   }
 
   if(!unit) return <div className="card">Unit not found. <Link to="/">Back</Link></div>
