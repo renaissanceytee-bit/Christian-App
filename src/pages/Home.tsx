@@ -50,6 +50,12 @@ export default function Home(){
           <li>Take a quick 5-question quiz.</li>
           <li>Progress saved locally — export a backup anytime.</li>
         </ol>
+        <div style={{marginTop:12}}>
+          <div className="small">Course progress</div>
+          <div className="progress-bar" style={{marginTop:8}}>
+            <i style={{width: `${(Number(localStorage.getItem('progress') ? Object.keys(JSON.parse(localStorage.getItem('progress')||'{}')).length : 0) / 30) * 100}%`}}></i>
+          </div>
+        </div>
       </section>
 
       <section className="card">

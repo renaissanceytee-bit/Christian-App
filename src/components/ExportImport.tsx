@@ -79,6 +79,18 @@ export default function ExportImport(){
       </div>
 
       <div className="card">
+        <h3>Settings</h3>
+        <p className="small">Autosave quiz answers: {localStorage.getItem('autosave_enabled') === 'false' ? 'Off' : 'On'}</p>
+        <div style={{display:'flex',gap:8,alignItems:'center'}}>
+          <button className="button" onClick={()=>{
+            const currently = localStorage.getItem('autosave_enabled') === 'false'
+            localStorage.setItem('autosave_enabled', currently ? 'true':'false')
+            window.location.reload()
+          }}>{localStorage.getItem('autosave_enabled') === 'false' ? 'Enable Autosave' : 'Disable Autosave'}</button>
+        </div>
+      </div>
+
+      <div className="card">
         <h3>Danger Zone</h3>
         <button onClick={clearAll}>Clear Local Data</button>
       </div>

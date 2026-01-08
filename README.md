@@ -19,6 +19,8 @@ Local setup:
 
 This is a minimal, zero-cost stack: no paid APIs are used.
 
-New features added: a fresh, friendly UI, streak tracking, PWA manifest and service worker skeleton, daily reminder tools (in-app reminders and downloadable calendar reminder), and export/import for local backups.
+New features added: a fresh, friendly UI, streak tracking, PWA manifest and service worker skeleton, daily reminder tools (in-app reminders and downloadable calendar reminder), autosave for quiz answers (toggleable), premium gating hooks for a freemium model, and export/import for local backups.
 
-Next steps (optional): add a small push-server (open-source `web-push`) to enable web push notifications, or add persistent backend with SQLite if you want server-side backups or accounts.
+Next steps (optional): add a small push-server (open-source `web-push`) to enable web push notifications, add a simple Node+SQLite backend for server-side backups and user accounts, and integrate a payment provider if you choose a paid tier.
+
+CI/CD: A GitHub Actions workflow has been added to build and deploy the site (deploy step uses GitHub Pages).

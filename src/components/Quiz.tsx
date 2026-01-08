@@ -1,8 +1,29 @@
 import React, {useState} from 'react'
 
-export default function Quiz({quiz, onAllCorrect}:{quiz:any[], onAllCorrect?:()=>void}){
+export default function Quiz({quiz, unitId, onAllCorrect}:{quiz:any[], unitId?:number, onAllCorrect?:()=>void}){
   const [answers, setAnswers] = useState<Record<number, number | boolean | null>>({})
   const [showResult, setShowResult] = useState(false)
+
+  // load autosave setting
+  const autosaveEnabled = localStorage.getItem('autosave_enabled') !== 'false'
+
+  // load saved answers for this unit
+  React.useEffect(()=>{
+    if(unitId && autosaveEnabled){
+      const raw = localStorage.getItem(`answers_unit_${unitId}`)
+      if(raw){
+        try{ setAnswers(JSON.parse(raw)) }catch(e){}
+      }
+    }
+  },[unitId])
+
+  const saveAnswers = (newAnswers:Record<number, number | boolean | null>)=>{
+    setAnswers(newAnswers)
+    if(unitId && autosaveEnabled){
+      localStorage.setItem(`answers_unit_${unitId}`, JSON.stringify(newAnswers))
+    }
+  }
+
   const checkAll = () => {
     if(!quiz) return
     let allCorrect = true
@@ -32,18 +53,18 @@ export default function Quiz({quiz, onAllCorrect}:{quiz:any[], onAllCorrect?:()=
           <div style={{marginTop:6}}>
             {q.type==='tf' ? (
               <label style={{marginRight:12}}>
-                <input type="radio" name={`q${idx}`} onChange={()=>setAnswers({...answers,[idx]:true})} /> True
+                <input checked={answers[idx]===true} type="radio" name={`q${idx}`} onChange={()=>saveAnswers({...answers,[idx]:true})} /> True
               </label>
             ) : null}
             {q.type==='tf' ? (
               <label>
-                <input type="radio" name={`q${idx}`} onChange={()=>setAnswers({...answers,[idx]:false})} /> False
+                <input checked={answers[idx]===false} type="radio" name={`q${idx}`} onChange={()=>saveAnswers({...answers,[idx]:false})} /> False
               </label>
             ) : null}
 
             {q.type==='mc' && q.options && q.options.map((opt:string,oidx:number)=> (
               <label key={oidx} style={{display:'block'}}>
-                <input type="radio" name={`q${idx}`} onChange={()=>setAnswers({...answers,[idx]:oidx})} /> {opt}
+                <input checked={answers[idx]===oidx} type="radio" name={`q${idx}`} onChange={()=>saveAnswers({...answers,[idx]:oidx})} /> {opt}
               </label>
             ))}
           </div>

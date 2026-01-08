@@ -66,10 +66,36 @@ export default function UnitPage(){
 
   if(!unit) return <div className="card">Unit not found. <Link to="/">Back</Link></div>
 
+  // premium gating: if unit is premium and user hasn't unlocked, show prompt
+  const hasPremium = localStorage.getItem('hasPremium') === '1'
+
+  function unlock(){
+    // placeholder purchase flow - marks premium unlocked locally
+    if(confirm('Unlock premium content for free demo? This simulates purchase.')){
+      localStorage.setItem('hasPremium','1')
+      window.location.reload()
+    }
+  }
+
+  if(!unit) return <div className="card">Unit not found. <Link to="/">Back</Link></div>
+
+  if(unit['premium'] && !hasPremium){
+    return (
+      <div className="card">
+        <h2>{unit.title}</h2>
+        <p className="small">This unit is part of the premium track. Unlock premium to continue. (In a real app this would be a paid upgrade.)</p>
+        <div style={{display:'flex',gap:8}}>
+          <button className="button" onClick={unlock}>Unlock Premium</button>
+          <Link to="/" className="small">Back to Home</Link>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className="card">
-        <div className="unit-title">{unit.title}</div>
+        <div className="unit-title">{unit.title}{unit['premium']? ' 🔒':''}</div>
         <div className="small">Purpose: {unit.purpose}</div>
         <div className="study">
           {unit.study.map((p,i)=> <p key={i}>{p}</p>)}
@@ -84,7 +110,7 @@ export default function UnitPage(){
 
       <div className="card quiz">
         <h3>Quick Quiz</h3>
-        <Quiz quiz={unit.quiz} onAllCorrect={handleComplete} />
+        <Quiz quiz={unit.quiz} unitId={unit.id} onAllCorrect={handleComplete} />
         {completed && <div className="small" style={{marginTop:8,color:'green'}}>Unit completed — saved locally.</div>}
       </div>
 
