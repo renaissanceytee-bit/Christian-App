@@ -7,6 +7,10 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 
+// Import Stripe routes
+const stripeRouter = require('./stripe')
+app.use('/api/stripe', stripeRouter)
+
 // In-memory store for subscriptions (for demo purposes only)
 let subscriptions = []
 

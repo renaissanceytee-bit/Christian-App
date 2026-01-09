@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import { Link } from 'react-router-dom'
+const PushSetup = React.lazy(()=>import('../components/PushSetup'))
 
 export default function Home(){
   const [email, setEmail] = useState('')
@@ -16,6 +17,8 @@ export default function Home(){
     setTimeout(()=>setSaved(false),3000)
     setEmail('')
   }
+
+  const onboarded = localStorage.getItem('onboarded') === '1'
 
   return (
     <div>
@@ -41,6 +44,14 @@ export default function Home(){
           </div>
         </div>
       </section>
+
+      {!onboarded && (
+        <div className="card">
+          <h3>Quick setup</h3>
+          <p className="small">New here? Start a quick setup to set reminders and personalize your experience.</p>
+          <Link className="button" to="/onboarding">Start Quick Setup</Link>
+        </div>
+      )}
 
       <section className="card">
         <h2>How it works</h2>
@@ -112,6 +123,12 @@ export default function Home(){
             a.click()
             URL.revokeObjectURL(url)
           }}>Download Calendar Reminder</button>
+        </div>
+        {/* Push subscription setup */}
+        <div style={{marginTop:12}}>
+          <React.Suspense fallback={<div className="small">Loading...</div>}>
+            <PushSetup />
+          </React.Suspense>
         </div>
       </section>
 

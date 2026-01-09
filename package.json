@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "vite"
+    "start": "vite",
+    "start:push-server": "node server/index.js",
+    "readability:report": "node scripts/readability_report.cjs"
   },
   "dependencies": {
     "react": "^18.2.0",

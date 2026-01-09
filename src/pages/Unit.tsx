@@ -9,6 +9,7 @@ type Unit = {
   study: string[]
   verses: {ref:string,text:string}[]
   quiz: any[]
+  premium?: boolean
 }
 
 export default function UnitPage(){
@@ -20,7 +21,7 @@ export default function UnitPage(){
     fetch('/src/data/units.json').then(r=>r.json()).then((data:Unit[])=>{
       const u = data.find(d=>String(d.id)===String(id))
       setUnit(u||null)
-      const progress = JSON.parse(localStorage.getItem('progress'||'{}')||'{}')
+      const progress = JSON.parse(localStorage.getItem('progress') || '{}')
       setCompleted(Boolean(progress?.[id as string]))
     })
   },[id])
@@ -77,9 +78,7 @@ export default function UnitPage(){
     }
   }
 
-  if(!unit) return <div className="card">Unit not found. <Link to="/">Back</Link></div>
-
-  if(unit['premium'] && !hasPremium){
+  if(unit.premium && !hasPremium){
     return (
       <div className="card">
         <h2>{unit.title}</h2>
@@ -95,7 +94,7 @@ export default function UnitPage(){
   return (
     <div>
       <div className="card">
-        <div className="unit-title">{unit.title}{unit['premium']? ' 🔒':''}</div>
+        <div className="unit-title">{unit.title}{unit.premium? ' 🔒':''}</div>
         <div className="small">Purpose: {unit.purpose}</div>
         <div className="study">
           {unit.study.map((p,i)=> <p key={i}>{p}</p>)}

@@ -12,6 +12,7 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
     "sqlite3": "^5.1.6",
+    "stripe": "^12.0.0",
     "web-push": "^3.5.0"
   }
 }
