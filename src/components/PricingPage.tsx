@@ -1,146 +1,237 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 export default function PricingPage() {
-  const [stripePublicKey, setStripePublicKey] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
 
-  useEffect(() => {
-    // Fetch Stripe public key
-    const fetchKey = async () => {
-      try {
-        const res = await fetch('/api/stripe/public-key');
-        const data = await res.json();
-        setStripePublicKey(data.publicKey);
-      } catch (err: any) {
-        console.error('Failed to fetch Stripe key:', err);
-      }
-    };
-    fetchKey();
-  }, []);
-
-  const handleUpgradeClick = async () => {
+  const handleCheckout = async (priceType: 'monthly' | 'annual') => {
     setLoading(true);
+    setError('');
     try {
-      const res = await fetch('/api/stripe/create-checkout-session', {
+      const response = await fetch('/api/stripe/create-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          priceId: 'price_test_premium_monthly',
-        }),
+        body: JSON.stringify({ priceType }),
       });
-      const data: any = await res.json();
-      const { sessionId, error } = data;
-      if (error) throw new Error(error);
-
-      // Redirect to Stripe (in production, use @stripe/react-stripe-js)
-      if (window.location.href.includes('localhost')) {
-        console.log('Test mode: Stripe checkout session created:', sessionId);
-        alert('In production, you would be redirected to Stripe Checkout.\nSession ID: ' + sessionId);
+      if (!response.ok) throw new Error('Failed to create checkout');
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url;
       }
     } catch (err: any) {
-      console.error('Checkout error:', err);
-      alert('Error: ' + err.message);
+      setError(err.message || 'Checkout failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-      <h1>Christian App Pricing</h1>
+    <div style={{ padding: '2rem', maxWidth: '1000px', margin: '0 auto' }}>
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+        <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Simple, Transparent Pricing</h1>
+        <p style={{ fontSize: '1.1rem', color: '#666' }}>
+          Start free. Upgrade when you're ready for unlimited learning.
+        </p>
+      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', margin: '2rem 0' }}>
-        {/* Free Plan */}
+      {/* Billing Toggle */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '3rem', gap: '1rem' }}>
+        <button
+          onClick={() => setBillingCycle('monthly')}
+          style={{
+            padding: '0.75rem 1.5rem',
+            backgroundColor: billingCycle === 'monthly' ? '#4CAF50' : '#e0e0e0',
+            color: billingCycle === 'monthly' ? '#fff' : '#333',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+          }}
+        >
+          Monthly
+        </button>
+        <button
+          onClick={() => setBillingCycle('annual')}
+          style={{
+            padding: '0.75rem 1.5rem',
+            backgroundColor: billingCycle === 'annual' ? '#4CAF50' : '#e0e0e0',
+            color: billingCycle === 'annual' ? '#fff' : '#333',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            position: 'relative',
+          }}
+        >
+          Annual
+          <span
+            style={{
+              position: 'absolute',
+              top: '-25px',
+              right: '0',
+              backgroundColor: '#ff6b35',
+              color: '#fff',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '3px',
+              fontSize: '0.75rem',
+              fontWeight: 'bold',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Save 34%
+          </span>
+        </button>
+      </div>
+
+      {/* Pricing Cards */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: '2rem',
+          marginBottom: '2rem',
+        }}
+      >
+        {/* Free Tier */}
         <div
           style={{
             border: '2px solid #e0e0e0',
             borderRadius: '8px',
-            padding: '1.5rem',
+            padding: '2rem',
             backgroundColor: '#fafafa',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
-          <h2>Free</h2>
-          <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#333' }}>$0</p>
-          <ul style={{ listStyle: 'none', padding: 0, margin: '1rem 0' }}>
-            <li>✓ Units 1-2 access</li>
-            <li>✓ 1 quiz attempt per unit</li>
-            <li>✓ Basic progress tracking</li>
-            <li>✗ All units (Units 3-6+)</li>
-            <li>✗ Unlimited attempts</li>
-            <li>✗ Offline mode</li>
+          <h2 style={{ marginBottom: '0.5rem' }}>Free</h2>
+          <p style={{ color: '#666', marginBottom: '1.5rem' }}>Get started with our basics</p>
+
+          <div style={{ marginBottom: '2rem' }}>
+            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+              $0<span style={{ fontSize: '1rem', color: '#666' }}>/month</span>
+            </div>
+            <p style={{ color: '#888', fontSize: '0.9rem' }}>Always free, always basic access</p>
+          </div>
+
+          <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem', flex: 1 }}>
+            <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #f0f0f0' }}>✓ All 6 units</li>
+            <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #f0f0f0' }}>✓ Quiz lessons</li>
+            <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #f0f0f0' }}>✓ Daily progress tracking</li>
+            <li style={{ padding: '0.5rem 0', color: '#ff6b35', fontWeight: 'bold' }}>3 incorrect answers/day limit</li>
           </ul>
+
           <button
-            disabled
             style={{
-              width: '100%',
-              padding: '0.75rem',
-              backgroundColor: '#ccc',
-              color: '#666',
+              padding: '0.75rem 1.5rem',
+              backgroundColor: '#e0e0e0',
               border: 'none',
               borderRadius: '4px',
               cursor: 'not-allowed',
+              fontWeight: 'bold',
             }}
+            disabled
           >
             Current Plan
           </button>
         </div>
 
-        {/* Premium Plan */}
+        {/* Premium Tier */}
         <div
           style={{
-            border: '2px solid #4CAF50',
+            border: '3px solid #4CAF50',
             borderRadius: '8px',
-            padding: '1.5rem',
-            backgroundColor: '#f0f9f0',
+            padding: '2rem',
+            backgroundColor: '#f9fff9',
+            display: 'flex',
+            flexDirection: 'column',
+            position: 'relative',
           }}
         >
-          <h2>Premium</h2>
-          <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#4CAF50' }}>$4.99/month</p>
-          <ul style={{ listStyle: 'none', padding: 0, margin: '1rem 0' }}>
-            <li>✓ All units (6+)</li>
-            <li>✓ Unlimited quiz attempts</li>
-            <li>✓ Advanced progress tracking</li>
-            <li>✓ Offline mode</li>
-            <li>✓ Ad-free experience</li>
-            <li>✓ Email support</li>
-          </ul>
-          <button
-            onClick={handleUpgradeClick}
-            disabled={loading || !stripePublicKey}
+          <div
             style={{
-              width: '100%',
-              padding: '0.75rem',
+              position: 'absolute',
+              top: '-15px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#ff6b35',
+              color: '#fff',
+              padding: '0.5rem 1rem',
+              borderRadius: '20px',
+              fontWeight: 'bold',
+              fontSize: '0.85rem',
+            }}
+          >
+            50% OFF TODAY
+          </div>
+
+          <h2 style={{ marginBottom: '0.5rem' }}>Premium</h2>
+          <p style={{ color: '#666', marginBottom: '1.5rem' }}>Unlimited learning power</p>
+
+          <div style={{ marginBottom: '2rem' }}>
+            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '0.5rem' }}>
+              {billingCycle === 'monthly' ? '$3.99' : '$35.99'}
+              <span style={{ fontSize: '1rem', color: '#666' }}>
+                {billingCycle === 'monthly' ? '/month' : '/year'}
+              </span>
+            </div>
+            {billingCycle === 'annual' && (
+              <p style={{ color: '#4CAF50', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                Just $2.99/month billed annually
+              </p>
+            )}
+          </div>
+
+          <ul style={{ listStyle: 'none', padding: 0, marginBottom: '2rem', flex: 1 }}>
+            <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #e8f5e9' }}>✓ All 6 units</li>
+            <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #e8f5e9' }}>✓ Quiz lessons</li>
+            <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #e8f5e9' }}>✓ Daily progress tracking</li>
+            <li style={{ padding: '0.5rem 0', borderBottom: '1px solid #e8f5e9', color: '#4CAF50', fontWeight: 'bold' }}>
+              ✓ Unlimited attempts
+            </li>
+            <li style={{ padding: '0.5rem 0', color: '#4CAF50', fontWeight: 'bold' }}>✓ No daily limits</li>
+          </ul>
+
+          <button
+            onClick={() => handleCheckout(billingCycle)}
+            disabled={loading}
+            style={{
+              padding: '0.75rem 1.5rem',
               backgroundColor: '#4CAF50',
               color: '#fff',
               border: 'none',
               borderRadius: '4px',
               cursor: loading ? 'not-allowed' : 'pointer',
               fontWeight: 'bold',
+              opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? 'Processing...' : 'Upgrade Now'}
+            {loading ? 'Processing...' : billingCycle === 'monthly' ? 'Upgrade Now' : 'Get Annual Plan'}
           </button>
         </div>
       </div>
 
-      <div style={{ marginTop: '2rem', padding: '1rem', backgroundColor: '#f9f9f9', borderRadius: '4px' }}>
-        <h3>Frequently Asked Questions</h3>
-        <details style={{ marginBottom: '1rem' }}>
-          <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>Can I cancel anytime?</summary>
-          <p>Yes! Cancel your subscription anytime from your account settings. No refunds on partial months.</p>
-        </details>
-        <details style={{ marginBottom: '1rem' }}>
-          <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>What payment methods do you accept?</summary>
-          <p>We accept all major credit and debit cards through Stripe.</p>
-        </details>
-        <details>
-          <summary style={{ cursor: 'pointer', fontWeight: 'bold' }}>Is my payment information secure?</summary>
-          <p>
-            Yes! We use Stripe for all payment processing. We never store your payment card details. Your data is
-            encrypted and PCI-compliant.
-          </p>
-        </details>
+      {/* Info Box */}
+      <div
+        style={{
+          backgroundColor: '#f5f5f5',
+          padding: '1.5rem',
+          borderRadius: '4px',
+          textAlign: 'center',
+          color: '#666',
+        }}
+      >
+        <p style={{ margin: 0 }}>
+          <strong>Free users</strong> get 3 incorrect answers per day. Upgrade to remove this limit and study at your own pace.
+        </p>
       </div>
+
+      {error && (
+        <div style={{ color: 'red', marginTop: '1rem', textAlign: 'center' }}>
+          {error}
+        </div>
+      )}
     </div>
   );
 }
