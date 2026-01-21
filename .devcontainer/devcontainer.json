@@ -1,0 +1,42 @@
+{
+  "name": "Christian App Development",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode.vscode-typescript-next",
+        "dsznajder.es7-react-js-snippets",
+        "formulahendry.auto-rename-tag",
+        "github.copilot"
+      ],
+      "settings": {
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        }
+      }
+    }
+  },
+
+  "forwardPorts": [5173, 4000],
+  "portsAttributes": {
+    "5173": {
+      "label": "Vite Dev Server",
+      "onAutoForward": "notify"
+    },
+    "4000": {
+      "label": "Backend API Server",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "postCreateCommand": "bash -c 'npm ci && (cd server && npm ci || echo \"Server dependencies skipped\")'",
+  
+  "remoteUser": "node"
+}

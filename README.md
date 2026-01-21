@@ -50,6 +50,24 @@ This repository contains an offline-first, freemium Christian study app with dai
 
 ## Quick Start
 
+### GitHub Codespaces (Recommended)
+
+Get started instantly with a pre-configured cloud development environment:
+
+1. Click the **Code** button at the top of this repository
+2. Select the **Codespaces** tab
+3. Click **Create codespace on [branch]**
+4. Wait for the environment to build (first time takes ~2-3 minutes)
+5. Once ready, the development container will have all dependencies installed
+6. Run `npm run dev` to start the frontend server
+7. Run `npm run start:push-server` (in a new terminal) for the optional backend
+
+The Codespace is pre-configured with:
+- Node.js 18
+- VS Code extensions for React, TypeScript, ESLint, Prettier
+- Automatic port forwarding for frontend (5173) and backend (4000)
+- All dependencies pre-installed
+
 ### Frontend (Dev)
 ```bash
 npm install
