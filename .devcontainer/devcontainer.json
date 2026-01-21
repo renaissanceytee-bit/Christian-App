@@ -2,10 +2,6 @@
   "name": "Christian App Development",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
   
-  "features": {
-    "ghcr.io/devcontainers/features/git:1": {}
-  },
-
   "customizations": {
     "vscode": {
       "extensions": [
@@ -40,7 +36,7 @@
     }
   },
 
-  "postCreateCommand": "npm install && cd server && npm install && cd ..",
+  "postCreateCommand": "npm ci && (cd server && npm ci || echo 'Server dependencies skipped') && cd ..",
   
   "remoteUser": "node"
 }
