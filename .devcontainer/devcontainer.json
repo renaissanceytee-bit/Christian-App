@@ -36,7 +36,7 @@
     }
   },
 
-  "postCreateCommand": "npm ci && (cd server && npm ci || echo 'Server dependencies skipped') && cd ..",
+  "postCreateCommand": "bash -c 'npm ci && (cd server && npm ci || echo \"Server dependencies skipped\")'",
   
   "remoteUser": "node"
 }
